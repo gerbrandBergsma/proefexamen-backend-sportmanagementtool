@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\WedstrijdController;
+
 
 // Teams routes
 Route::get('/teams', [TeamController::class, 'index']);
@@ -23,4 +25,4 @@ Route::delete('/players/{id}', [PlayerController::class, 'destroy']);
 Route::apiResource('trainings', TrainingController::class);
 // routes/api.php
 Route::post('/trainings/{training}/attendance', [TrainingController::class, 'updateAttendance']);
-
+Route::apiResource('wedstrijden', WedstrijdController::class);

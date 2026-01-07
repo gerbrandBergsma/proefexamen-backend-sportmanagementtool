@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Team;
+use App\Models\Player;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +13,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Lijst van voorbeeldteams
+        $teamsData = [
+            ['naam' => 'Rood Leeuwen', 'sportsoort' => 'Voetbal', 'categorie' => 'Junioren'],
+            ['naam' => 'Blauwe Tijgers', 'sportsoort' => 'Basketbal', 'categorie' => 'Senioren'],
+            ['naam' => 'Gele Vlammen', 'sportsoort' => 'Hockey', 'categorie' => 'Junioren'],
+            ['naam' => 'Groene Slangen', 'sportsoort' => 'Volleybal', 'categorie' => 'Senioren'],
+            ['naam' => 'Zwarte Panters', 'sportsoort' => 'Rugby', 'categorie' => 'Senioren'],
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        foreach ($teamsData as $teamData) {
+            $team = Team::create($teamData);
+
+            // Voeg 2 spelers per team toe
+            for ($i = 1; $i <= 2; $i++) {
+                Player::create([
+                    'naam' => $team->naam . " Speler $i",
+                    'leeftijd' => rand(18, 30),
+                    'team_id' => $team->id,
+                    'blessure' => null,
+                ]);
+            }
+        }
     }
 }
