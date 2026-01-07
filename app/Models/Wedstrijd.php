@@ -13,7 +13,10 @@ class Wedstrijd extends Model
         'team_uit_id',
         'datum',
         'locatie',
+        'uitslag_thuis',
+        'uitslag_uit',
     ];
+    
 
     public function teamThuis()
     {

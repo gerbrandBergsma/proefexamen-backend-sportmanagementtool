@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 class WedstrijdController extends Controller
 {
+    // Alle wedstrijden ophalen
     public function index()
     {
         return response()->json(
@@ -14,6 +15,7 @@ class WedstrijdController extends Controller
         );
     }
 
+    // Nieuwe wedstrijd aanmaken
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -21,13 +23,19 @@ class WedstrijdController extends Controller
             'team_uit_id'   => 'required|exists:teams,id|different:team_thuis_id',
             'datum'         => 'required|date',
             'locatie'       => 'required|string|max:255',
+            'uitslag_thuis' => 'nullable|integer|min:0',
+            'uitslag_uit'   => 'nullable|integer|min:0',
         ]);
 
         $wedstrijd = Wedstrijd::create($validated);
+        
+        // Laad de teams direct voordat je de response terugstuurt
+        $wedstrijd->load(['teamThuis', 'teamUit']);
 
         return response()->json($wedstrijd, 201);
     }
 
+    // Eén wedstrijd tonen
     public function show(Wedstrijd $wedstrijd)
     {
         return response()->json(
@@ -35,24 +43,33 @@ class WedstrijdController extends Controller
         );
     }
 
+    // Wedstrijd updaten
     public function update(Request $request, Wedstrijd $wedstrijd)
     {
         $validated = $request->validate([
-            'team_thuis_id' => 'sometimes|exists:teams,id',
-            'team_uit_id'   => 'sometimes|exists:teams,id|different:team_thuis_id',
-            'datum'         => 'sometimes|date',
-            'locatie'       => 'sometimes|string|max:255',
+            'team_thuis_id' => 'required|exists:teams,id',
+            'team_uit_id'   => 'required|exists:teams,id|different:team_thuis_id',
+            'datum'         => 'required|date',
+            'locatie'       => 'required|string|max:255',
+            'uitslag_thuis' => 'nullable|integer|min:0',
+            'uitslag_uit'   => 'nullable|integer|min:0',
         ]);
 
         $wedstrijd->update($validated);
+        
+        // Laad de teams ook hier
+        $wedstrijd->load(['teamThuis', 'teamUit']);
 
         return response()->json($wedstrijd);
     }
 
+    // Wedstrijd verwijderen
     public function destroy(Wedstrijd $wedstrijd)
     {
         $wedstrijd->delete();
 
-        return response()->json(['message' => 'Wedstrijd verwijderd']);
+        return response()->json([
+            'message' => 'Wedstrijd verwijderd'
+        ]);
     }
 }
