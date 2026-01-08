@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Wedstrijd;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class WedstrijdController extends Controller
 {
@@ -28,8 +29,6 @@ class WedstrijdController extends Controller
         ]);
 
         $wedstrijd = Wedstrijd::create($validated);
-        
-        // Laad de teams direct voordat je de response terugstuurt
         $wedstrijd->load(['teamThuis', 'teamUit']);
 
         return response()->json($wedstrijd, 201);
@@ -55,21 +54,31 @@ class WedstrijdController extends Controller
             'uitslag_uit'   => 'nullable|integer|min:0',
         ]);
 
+        Log::info('Before update:', $wedstrijd->toArray());
+        Log::info('Validated data:', $validated);
+        
         $wedstrijd->update($validated);
         
-        // Laad de teams ook hier
-        $wedstrijd->load(['teamThuis', 'teamUit']);
+        Log::info('After update (from model):', $wedstrijd->toArray());
+        Log::info('After update (fresh from DB):', $wedstrijd->fresh()->toArray());
 
-        return response()->json($wedstrijd);
+        return response()->json($wedstrijd->fresh()->load(['teamThuis', 'teamUit']));
     }
 
     // Wedstrijd verwijderen
     public function destroy(Wedstrijd $wedstrijd)
     {
+        $id = $wedstrijd->id;
+        
+        Log::info('Before delete:', ['id' => $id]);
+        
         $wedstrijd->delete();
+        
+        $still_exists = Wedstrijd::find($id);
+        Log::info('After delete:', ['id' => $id, 'still_exists' => $still_exists !== null]);
 
         return response()->json([
             'message' => 'Wedstrijd verwijderd'
-        ]);
+        ], 200);
     }
 }

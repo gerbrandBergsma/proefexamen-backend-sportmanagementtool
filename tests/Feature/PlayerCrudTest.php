@@ -17,13 +17,13 @@ class PlayerCrudTest extends TestCase
     {
         $team = Team::factory()->create();
 
-        $response = $this->post('/players', [
+        $response = $this->postJson('/api/players', [
             'naam' => 'Jan Jansen',
             'leeftijd' => 20,
             'team_id' => $team->id,
         ]);
 
-        $response->assertStatus(302);
+        $response->assertStatus(201);
         $this->assertDatabaseHas('players', ['naam' => 'Jan Jansen', 'team_id' => $team->id]);
     }
 
@@ -32,9 +32,9 @@ class PlayerCrudTest extends TestCase
     {
         $player = Player::factory()->create();
 
-        $response = $this->get("/players/{$player->id}");
-        $response->assertStatus(200);
-        $response->assertSee($player->naam);
+        $response = $this->getJson("/api/players/{$player->id}");
+        $response->assertStatus(200)
+                 ->assertJsonFragment(['naam' => $player->naam]);
     }
 
     #[Test]
@@ -43,13 +43,13 @@ class PlayerCrudTest extends TestCase
         $player = Player::factory()->create();
         $team = Team::factory()->create();
 
-        $response = $this->put("/players/{$player->id}", [
+        $response = $this->putJson("/api/players/{$player->id}", [
             'naam' => 'Piet Pietersen',
             'leeftijd' => 22,
             'team_id' => $team->id,
         ]);
 
-        $response->assertStatus(302);
+        $response->assertStatus(200);
         $this->assertDatabaseHas('players', ['naam' => 'Piet Pietersen', 'team_id' => $team->id]);
     }
 
@@ -58,8 +58,8 @@ class PlayerCrudTest extends TestCase
     {
         $player = Player::factory()->create();
 
-        $response = $this->delete("/players/{$player->id}");
-        $response->assertStatus(302);
+        $response = $this->deleteJson("/api/players/{$player->id}");
+        $response->assertStatus(200);
         $this->assertDatabaseMissing('players', ['id' => $player->id]);
     }
 }

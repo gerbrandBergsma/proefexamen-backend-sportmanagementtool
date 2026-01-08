@@ -14,13 +14,13 @@ class TeamCrudTest extends TestCase
     #[Test]
     public function it_can_create_a_team()
     {
-        $response = $this->post('/teams', [
+        $response = $this->postJson('/api/teams', [
             'naam' => 'Heren 1',
             'sportsoort' => 'Voetbal',
             'categorie' => 'Senioren',
         ]);
 
-        $response->assertStatus(302); // redirect na creatie
+        $response->assertStatus(201);
         $this->assertDatabaseHas('teams', ['naam' => 'Heren 1']);
     }
 
@@ -29,9 +29,9 @@ class TeamCrudTest extends TestCase
     {
         $team = Team::factory()->create();
 
-        $response = $this->get("/teams/{$team->id}");
-        $response->assertStatus(200);
-        $response->assertSee($team->naam);
+        $response = $this->getJson("/api/teams/{$team->id}");
+        $response->assertStatus(200)
+                 ->assertJsonFragment(['naam' => $team->naam]);
     }
 
     #[Test]
@@ -39,13 +39,13 @@ class TeamCrudTest extends TestCase
     {
         $team = Team::factory()->create();
 
-        $response = $this->put("/teams/{$team->id}", [
+        $response = $this->putJson("/api/teams/{$team->id}", [
             'naam' => 'Dames 1',
             'sportsoort' => 'Hockey',
             'categorie' => 'Senioren',
         ]);
 
-        $response->assertStatus(302); // redirect na update
+        $response->assertStatus(200);
         $this->assertDatabaseHas('teams', ['naam' => 'Dames 1']);
     }
 
@@ -54,8 +54,8 @@ class TeamCrudTest extends TestCase
     {
         $team = Team::factory()->create();
 
-        $response = $this->delete("/teams/{$team->id}");
-        $response->assertStatus(302); // redirect na delete
+        $response = $this->deleteJson("/api/teams/{$team->id}");
+        $response->assertStatus(200);
         $this->assertDatabaseMissing('teams', ['id' => $team->id]);
     }
 }

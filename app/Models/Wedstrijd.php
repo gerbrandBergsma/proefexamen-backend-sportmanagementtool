@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Wedstrijd extends Model
 {
+    use HasFactory; // <-- dit toevoegen
+
     protected $table = 'wedstrijden';
 
     protected $fillable = [
@@ -16,7 +19,6 @@ class Wedstrijd extends Model
         'uitslag_thuis',
         'uitslag_uit',
     ];
-    
 
     public function teamThuis()
     {

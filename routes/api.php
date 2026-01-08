@@ -6,7 +6,6 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\WedstrijdController;
 
-
 // Teams routes
 Route::get('/teams', [TeamController::class, 'index']);
 Route::post('/teams', [TeamController::class, 'store']);
@@ -23,6 +22,9 @@ Route::delete('/players/{id}', [PlayerController::class, 'destroy']);
 
 // Trainings routes (API resource)
 Route::apiResource('trainings', TrainingController::class);
-// routes/api.php
 Route::post('/trainings/{training}/attendance', [TrainingController::class, 'updateAttendance']);
-Route::apiResource('wedstrijden', WedstrijdController::class);
+
+// Wedstrijden routes - specificeer de parameter naam als 'wedstrijd' (enkelvoud)
+Route::apiResource('wedstrijden', WedstrijdController::class)->parameters([
+    'wedstrijden' => 'wedstrijd'
+]);
