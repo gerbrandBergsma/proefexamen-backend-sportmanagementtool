@@ -35,6 +35,7 @@ class PlayerController extends Controller
             'naam' => 'sometimes|required|string|max:255',
             'leeftijd' => 'sometimes|required|integer|min:0',
             'team_id' => 'sometimes|required|exists:teams,id',
+            'blessure' => 'nullable|string|max:255', 
         ]);
 
         $player->update($validated);
