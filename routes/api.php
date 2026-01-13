@@ -5,6 +5,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\WedstrijdController;
+use App\Http\Controllers\StatistiekenController;
 
 // Teams routes
 Route::get('/teams', [TeamController::class, 'index']);
@@ -28,3 +29,7 @@ Route::post('/trainings/{training}/attendance', [TrainingController::class, 'upd
 Route::apiResource('wedstrijden', WedstrijdController::class)->parameters([
     'wedstrijden' => 'wedstrijd'
 ]);
+
+
+Route::get('/statistieken', [StatistiekenController::class, 'apiIndex']);
+
