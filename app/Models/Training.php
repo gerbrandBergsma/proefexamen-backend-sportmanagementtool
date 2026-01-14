@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\TrainingAttendance; // <-- toevoegen
-use App\Models\Player;             // <-- toevoegen
-use App\Models\Team;               // <-- toevoegen
+use App\Models\TrainingAttendance;
+use App\Models\Player;
+use App\Models\Team;
 
 class Training extends Model
 {
@@ -23,28 +23,22 @@ class Training extends Model
     ];
 
     /**
-     * Het team waartoe deze training behoort
+     * Team waartoe deze training behoort
      */
     public function team()
     {
         return $this->belongsTo(Team::class);
     }
 
-    /**
-     * Alle aanwezigen bij deze training
-     */
     public function attendances()
     {
         return $this->hasMany(TrainingAttendance::class);
     }
 
-    /**
-     * Spelers van het team met aanwezigheidsstatus
-     */
     public function players()
     {
         return $this->belongsToMany(Player::class, 'training_attendances')
-                    ->withPivot('status')
-                    ->withTimestamps();
+            ->withPivot('status')
+            ->withTimestamps();
     }
 }

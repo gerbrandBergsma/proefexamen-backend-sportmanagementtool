@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Training;
-use App\Models\TrainingAttendance;
 use Illuminate\Http\Request;
 
 class TrainingController extends Controller
 {
     /**
-     * Alle trainingen ophalen
-     * (met team + spelers + aanwezigheid)
+     * Alle trainingen ophalen (met team + spelers + status)
      */
     public function index()
     {
@@ -22,7 +20,7 @@ class TrainingController extends Controller
     }
 
     /**
-     * Nieuwe training aanmaken
+     * Nieuwe training aanmaken + spelers automatisch koppelen
      */
     public function store(Request $request)
     {
@@ -38,17 +36,16 @@ class TrainingController extends Controller
 
         $training = Training::create($validated);
 
-        // Voor alle spelers van het team automatisch attendance aanmaken
+        // spelers van team koppelen met default status
+        $syncData = [];
         foreach ($training->team->players as $player) {
-            TrainingAttendance::create([
-                'training_id' => $training->id,
-                'player_id' => $player->id,
-                'status' => 'unknown',
-            ]);
+            $syncData[$player->id] = ['status' => 'unknown'];
         }
 
+        $training->players()->sync($syncData);
+
         return response()->json(
-            $training->load('team', 'players'),
+            $training->load(['team', 'players']),
             201
         );
     }
@@ -59,7 +56,7 @@ class TrainingController extends Controller
     public function show(Training $training)
     {
         return response()->json(
-            $training->load('team', 'players', 'attendances')
+            $training->load(['team', 'players'])
         );
     }
 
@@ -80,7 +77,7 @@ class TrainingController extends Controller
         $training->update($validated);
 
         return response()->json(
-            $training->load('team', 'players')
+            $training->load(['team', 'players'])
         );
     }
 
@@ -92,31 +89,26 @@ class TrainingController extends Controller
         $training->delete();
 
         return response()->json([
-            'message' => 'Training verwijderd'
+            'message' => 'Training verwijderd',
         ]);
     }
 
     /**
-     * Aanwezigheid opslaan per speler
+     * Aanwezigheid opslaan
      */
     public function updateAttendance(Request $request, Training $training)
     {
         $attendance = $request->input('attendance', []);
 
         foreach ($attendance as $att) {
-            TrainingAttendance::updateOrCreate(
-                [
-                    'training_id' => $training->id,
-                    'player_id' => $att['player_id'],
-                ],
-                [
-                    'status' => $att['status'],
-                ]
+            $training->players()->updateExistingPivot(
+                $att['player_id'],
+                ['status' => $att['status']]
             );
         }
 
         return response()->json([
-            'message' => 'Aanwezigheid opgeslagen'
+            'message' => 'Aanwezigheid opgeslagen',
         ]);
     }
 }

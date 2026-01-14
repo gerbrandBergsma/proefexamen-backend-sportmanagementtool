@@ -20,4 +20,11 @@ class Player extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    public function trainings()
+    {
+        return $this->belongsToMany(Training::class, 'training_attendances')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
 }
