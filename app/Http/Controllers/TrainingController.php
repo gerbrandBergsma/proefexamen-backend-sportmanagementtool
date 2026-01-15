@@ -63,23 +63,26 @@ class TrainingController extends Controller
     /**
      * Training bijwerken
      */
-    public function update(Request $request, Training $training)
-    {
-        $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'training_date' => 'sometimes|required|date',
-            'start_time' => 'sometimes|required',
-            'end_time' => 'sometimes|required',
-            'location' => 'nullable|string|max:255',
-            'notes' => 'nullable|string',
-        ]);
-
-        $training->update($validated);
-
-        return response()->json(
-            $training->load(['team', 'players'])
-        );
-    }
+   
+     public function update(Request $request, Training $training)
+     {
+         $validated = $request->validate([
+             'team_id' => 'sometimes|required|exists:teams,id',
+             'title' => 'sometimes|required|string|max:255',
+             'training_date' => 'sometimes|required|date',
+             'start_time' => 'sometimes|required',
+             'end_time' => 'sometimes|required',
+             'location' => 'nullable|string|max:255',
+             'notes' => 'nullable|string',
+         ]);
+     
+         $training->update($validated);
+     
+         return response()->json(
+             $training->fresh()->load(['team', 'players'])
+         );
+     }
+     
 
     /**
      * Training verwijderen
